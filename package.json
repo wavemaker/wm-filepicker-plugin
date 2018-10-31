@@ -1,0 +1,32 @@
+{
+  "name": "wavemaker-plugin-file",
+  "version": "0.0.1",
+  "description": "Wavemaker File Plugin",
+  "types": "",
+  "cordova": {
+    "id": "cordova-plugin-wm-file",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "keywords": [],
+  "scripts": {},
+  "author": "Apache Software Foundation",
+  "license": "Apache-2.0",
+  "engines": {
+    "cordovaDependencies": {
+      "3.0.0": {
+        "cordova": ">100"
+      }
+    }
+  },
+  "devDependencies": {}
+}
