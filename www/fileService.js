@@ -1,4 +1,3 @@
-cordova.define("cordova-plugin-wm-file.fileService", function(require, exports, module) {
 /*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -80,6 +79,4 @@ FileService.prototype.selectAudio = function(multiple, successCallback, errorCal
 };
 
 module.exports = new FileService();
-
-});
 
