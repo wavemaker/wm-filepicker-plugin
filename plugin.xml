@@ -18,45 +18,47 @@
   under the License.
 -->
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    id="cordova-plugin-wm-file"
-    version="0.0.1">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
+    xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-wm-file" version="0.0.1">
     <name>File</name>
     <description>Wavemaker File Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,wavemaker,file</keywords>
-
+    <js-module src="www/fileService.js" name="fileService">
+        <clobbers target="cordova.wavemaker.fileService" />
+    </js-module>
     <!-- android -->
     <platform name="android">
-	<config-file target="AndroidManifest.xml" parent="/*">
-	    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-	    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	</config-file>
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        </config-file>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="FileService">
-		<param name="android-package" value="com.wavemaker.cordova.plugin.FileServicePlugin" />
-	    </feature>
+                <param name="android-package" value="com.wavemaker.cordova.plugin.FileServicePlugin" />
+            </feature>
         </config-file>
-	
-
-    	<js-module src="www/fileService.js" name="fileService">
-		<clobbers target="cordova.wavemaker.fileService" />
-    	</js-module>
 
         <source-file src="src/android/FileServicePlugin.java" target-dir="src/com/wavemaker/cordova/plugin" />
-	<source-file src="src/android/FileHelper.java" target-dir="src/com/wavemaker/cordova/plugin" />
+        <source-file src="src/android/FileHelper.java" target-dir="src/com/wavemaker/cordova/plugin" />
     </platform>
 
     <!-- ios -->
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
-            <feature name="Device">
-                <param name="ios-package" value="CDVDevice"/>
+            <feature name="FileService">
+                <param name="ios-package" value="WMFileService"/>
             </feature>
         </config-file>
-
-        <header-file src="src/ios/CDVDevice.h" />
-        <source-file src="src/ios/CDVDevice.m" />
+        <source-file src="src/ios/WMFileService.swift" />
+        <source-file src="src/ios/WMFilePicker.swift" />
+        <podspec>
+            <config>
+                <source url="https://github.com/CocoaPods/Specs.git"/>
+            </config>
+            <pods use-frameworks="true">
+                <pod name="AssetsPickerViewController" spec="~> 2.0" />
+            </pods>
+        </podspec>
     </platform>
 </plugin>

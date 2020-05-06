@@ -43,7 +43,8 @@ function FileService () {
 FileService.prototype.select = function (options, successCallback, errorCallback) {
     var DEFAULT_OPTIONS = {
         'mimeType': '*/*',
-        'multiple': false
+        'multiple': false,
+        "type": "FILE"
     };
     options = options || {};
     for (key in DEFAULT_OPTIONS) {
@@ -57,7 +58,8 @@ FileService.prototype.select = function (options, successCallback, errorCallback
 FileService.prototype.selectImage = function(multiple, successCallback, errorCallback) {
     var options = {
         "mimeType": "image/*",
-        "multiple": multiple
+        "multiple": multiple,
+        "type": "IMAGE"
     };
     this.select(options, successCallback, errorCallback);
 };
@@ -65,7 +67,8 @@ FileService.prototype.selectImage = function(multiple, successCallback, errorCal
 FileService.prototype.selectVideo = function(multiple, successCallback, errorCallback) {
     var options = {
         "mimeType": "video/*",
-        "multiple": multiple
+        "multiple": multiple,
+        "type": "VIDEO"
     };
     this.select(options, successCallback, errorCallback);
 };
@@ -73,7 +76,8 @@ FileService.prototype.selectVideo = function(multiple, successCallback, errorCal
 FileService.prototype.selectAudio = function(multiple, successCallback, errorCallback) {
     var options = {
         "mimeType": "audio/*",
-        "multiple": multiple
+        "multiple": multiple,
+        "type": "AUDIO"
     };
     this.select(options, successCallback, errorCallback);
 };
