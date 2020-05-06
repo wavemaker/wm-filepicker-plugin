@@ -12,15 +12,13 @@ public class WMFileService: CDVPlugin {
     
     @objc
     public func selectFiles(_ command: CDVInvokedUrlCommand) {
-        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: "GOT it");
         let options = command.argument(at: 0) as! [String: NSObject];
         let type = options["type"] as? String ?? "IMAGE";
         let multiple = options["multiple"] as? Bool ?? false;
         WMFilePicker.sharedInstance.present(vc: viewController, type: type, multiple: multiple, onCompletion:{ (urls: [URL]) in
-            urls.forEach { url in
-                NSLog("selected file (" + url.absoluteString + ")");
-            }
+            let paths = urls.map { url in url.absoluteString };
+            let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: paths);
+            self.commandDelegate.send(result, callbackId: command.callbackId);
         });
-        self.commandDelegate.send(result, callbackId: command.callbackId);
     }
 }
