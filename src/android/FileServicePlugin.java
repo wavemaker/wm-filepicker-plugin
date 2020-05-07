@@ -92,13 +92,24 @@ public class FileServicePlugin extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if ("selectFiles".equals(action)) {
             JSONObject options = args.getJSONObject(0);
+            String type = options.getString("type");
+            if (type == "IMAGE") {
+                this.mimeType = "image/*";
+            } else if (type == "VIDEO") {
+                this.mimeType = "video/*";
+            } else if (type == "AUDIO") {
+                this.mimeType = "audio/*";
+            } else {
+                this.mimeType = "*/*";
+            }
             this.mimeType = options.getString(STATE_PROPERTY_MIME_TYPE);
             this.multiple = options.getBoolean(STATE_PROPERTY_MULTIPLE);
             this.mCallbackContext = callbackContext;
-            if (!this.cordova.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            if (!this.cordova.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 this.cordova.requestPermission(this, 0, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            } else {
+                this.selectFiles();
             }
-            this.selectFiles();
         } else {
             return false;
         }
@@ -110,24 +121,17 @@ public class FileServicePlugin extends CordovaPlugin {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         JSONArray files = new JSONArray();
             if (requestCode == FILE_REQUEST_CODE) {
-                JSONObject result = new JSONObject();
                 if (resultCode == Activity.RESULT_OK) {
                     ClipData clipData = data.getClipData();
                     if (clipData != null) {
                         for (int i = 0; i < clipData.getItemCount(); i++) {
-                            files.put("" + getRealPath(clipData.getItemAt(i).getUri()));
+                            files.put("" + FileHelper.getPath(this.cordova.getActivity(), clipData.getItemAt(i).getUri()));
                         }
                     } else if (data.getData() != null) {
-                        files.put("" + getRealPath(data.getData()));
+                        files.put("" + FileHelper.getPath(this.cordova.getActivity(), data.getData()));
                     }
-                    try {
-                        result.put("files", files);
-                        this.mCallbackContext.success(result);
-                    } catch (JSONException jse) {
-                        this.mCallbackContext.error(ERROR_HAPPENED);
-                    } finally {
-                        this.mCallbackContext = null;
-                    }
+                    this.mCallbackContext.success(files);
+                    this.mCallbackContext = null;
                 }
             }
     }
@@ -147,8 +151,6 @@ public class FileServicePlugin extends CordovaPlugin {
         }
     }
 
-
-
     private void selectFiles() {
         Intent showBrowser = new Intent();
         showBrowser.setAction(Intent.ACTION_GET_CONTENT);
@@ -156,26 +158,6 @@ public class FileServicePlugin extends CordovaPlugin {
         showBrowser.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, multiple);
         showBrowser.setType(mimeType);
         this.cordova.startActivityForResult(this, showBrowser, FILE_REQUEST_CODE);
-    }
-
-    private String getRealPath(Uri uri) {
-        String path = FileHelper.getRealPath(uri, this.cordova.getActivity());
-        try {
-            if (path == null) {
-                InputStream inStream = FileHelper.getInputStreamFromUriString(uri.toString(), this.cordova.getActivity());
-                java.io.File temp = java.io.File.createTempFile("temp", "_" + System.currentTimeMillis(), this.cordova.getContext().getCacheDir());
-                OutputStream oStream = new FileOutputStream(temp);
-                byte[] buffer = new byte[1024];
-                int len;
-                while ((len = inStream.read(buffer)) != -1) {
-                    oStream.write(buffer, 0, len);
-                }
-                path = temp.getAbsolutePath();
-            }
-        } catch (Exception e) {
-            Log.e("FILE_CHOOSER", "Failed to resolve real path", e);
-        }
-        return path == null || path.startsWith("file://") ? path: "file://" + path;
     }
 }
 
