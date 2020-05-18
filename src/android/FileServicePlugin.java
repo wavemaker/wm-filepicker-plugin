@@ -93,17 +93,16 @@ public class FileServicePlugin extends CordovaPlugin {
         if ("selectFiles".equals(action)) {
             JSONObject options = args.getJSONObject(0);
             String type = options.getString("type");
-            if (type == "IMAGE") {
+            if ("IMAGE".equals(type)) {
                 this.mimeType = "image/*";
-            } else if (type == "VIDEO") {
+            } else if ("VIDEO".equals(type)) {
                 this.mimeType = "video/*";
-            } else if (type == "AUDIO") {
+            } else if ("AUDIO".equals(type)) {
                 this.mimeType = "audio/*";
             } else {
                 this.mimeType = "*/*";
             }
-            this.mimeType = options.getString(STATE_PROPERTY_MIME_TYPE);
-            this.multiple = options.getBoolean(STATE_PROPERTY_MULTIPLE);
+            this.multiple = options.getBoolean("multiple");
             this.mCallbackContext = callbackContext;
             if (!this.cordova.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 this.cordova.requestPermission(this, 0, Manifest.permission.WRITE_EXTERNAL_STORAGE);

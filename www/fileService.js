@@ -78,4 +78,12 @@ FileService.prototype.selectAudio = function(multiple, successCallback, errorCal
     this.select(options, successCallback, errorCallback);
 };
 
+FileService.prototype.selectFiles = function(multiple, successCallback, errorCallback) {
+    var options = {
+        "multiple": multiple,
+        "type": "FILE"
+    };
+    this.select(options, successCallback, errorCallback);
+};
+
 module.exports = new FileService();
