@@ -18,7 +18,7 @@ private let AUDIO = "AUDIO";
 private let FILE = "FILE";
 
 public class WMFilePickerConfig {
-    public var useCamera = true;
+    public var useCamera = false;
     public var useLibrary = true;
     public var useCloud = true;
 }
@@ -46,28 +46,36 @@ public class WMFilePicker: NSObject,
 
         self.completionHandler = onCompletion;
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet);
+        var handler = {(a:UIAlertAction?) in };
         if (type == IMAGE || type == VIDEO || type == AUDIO) {
             if (self.config.useCamera
                 && (type == IMAGE || type == VIDEO)
                 && UIImagePickerController.isSourceTypeAvailable(.camera)) {
                 let title = type == IMAGE ? "Take Picture" : "Capture Video";
-                alert.addAction(UIAlertAction(title: title, style: .default, handler: {(a) in
+                handler = {(a) in
                     self.capture(vc: vc, type: type);
-                }));
+                };
+                alert.addAction(UIAlertAction(title: title, style: .default, handler: handler));
             }
             if (self.config.useLibrary) {
-                alert.addAction(UIAlertAction(title: "Pick From Library", style: .default, handler: {(a) in
+                handler = {(a) in
                     self.showLibraryUI(view: vc, type: type, multiple: multiple);
-                }));
+                };
+                alert.addAction(UIAlertAction(title: "Pick From Library", style: .default, handler: handler));
             }
         }
         if (self.config.useCloud) {
-            alert.addAction(UIAlertAction(title: "Pick From Cloud", style: .default, handler: {(a) in
+            handler = {(a) in
                 self.showCloudUI(vc: vc, type: type, multiple: multiple);
-            }));
+            };
+            alert.addAction(UIAlertAction(title: "Pick From Cloud", style: .default, handler: handler));
         }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
-        vc.present(alert, animated: true, completion: nil)
+        if (alert.actions.count == 1) {
+            handler(nil);
+        } else {
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
+                vc.present(alert, animated: true, completion: nil);
+        }
     }
     
     private func capture(vc: UIViewController, type: String) {
