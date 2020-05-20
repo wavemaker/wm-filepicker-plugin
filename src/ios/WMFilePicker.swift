@@ -10,7 +10,6 @@ import Foundation
 import Photos
 import UIKit
 import MobileCoreServices
-import AssetsPickerViewController
 
 private let IMAGE = "IMAGE";
 private let VIDEO = "VIDEO";
@@ -27,8 +26,7 @@ public class WMFilePickerConfig {
 public class WMFilePicker: NSObject,
     UINavigationControllerDelegate,
     UIImagePickerControllerDelegate,
-    UIDocumentPickerDelegate,
-    AssetsPickerViewControllerDelegate {
+    UIDocumentPickerDelegate {
     
     public static let sharedInstance = WMFilePicker();
     
@@ -47,9 +45,8 @@ public class WMFilePicker: NSObject,
         self.completionHandler = onCompletion;
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet);
         var handler = {(a:UIAlertAction?) in };
-        if (type == IMAGE || type == VIDEO || type == AUDIO) {
+        if (type == IMAGE || type == VIDEO) {
             if (self.config.useCamera
-                && (type == IMAGE || type == VIDEO)
                 && UIImagePickerController.isSourceTypeAvailable(.camera)) {
                 let title = type == IMAGE ? "Take Picture" : "Capture Video";
                 handler = {(a) in
@@ -110,38 +107,34 @@ public class WMFilePicker: NSObject,
     }
     
     private func showLibraryUI(view: UIViewController, type: String, multiple: Bool) {
-        let picker = AssetsPickerViewController();
-        picker.pickerDelegate = self;
-        let options = PHFetchOptions();
-        options.includeHiddenAssets = true;
-        options.sortDescriptors = [
-            NSSortDescriptor(key: "creationDate", ascending: true),
-            NSSortDescriptor(key: "modificationDate", ascending: true)
-        ];
+        let picker = UIImagePickerController();
+        picker.delegate = self;
+        picker.sourceType = .photoLibrary;
         if (type == IMAGE) {
-            options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue);
+            picker.mediaTypes = ["public.image"];
         } else if (type == VIDEO) {
-            options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.video.rawValue);
+            picker.mediaTypes = ["public.movie"];
         } else if (type == AUDIO) {
-            options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.audio.rawValue);
-        } else {
-            options.predicate = NSPredicate(format: "1 == 1", true);
+            picker.mediaTypes = ["public.audio"];
         }
-        picker.pickerConfig.assetFetchOptions = [
-            .smartAlbum: options,
-            .album: options
-        ];
-        picker.pickerConfig.assetsMaximumSelectionCount = multiple ? Int.max : 1;
-        view.present(picker, animated: true, completion: nil)
+        view.present(picker, animated: true, completion: nil);
+        self.presentingViewController = picker;
     }
     
     //MARK: UIImagePickerControllerDelegate
     
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         let mediaType = info[UIImagePickerController.InfoKey.mediaType] as! NSString
-        if mediaType ==  kUTTypeMovie {
-            let videoURL = info[UIImagePickerController.InfoKey.mediaURL] as! URL
-            self.completionHandler?([videoURL])
+        if mediaType ==  "public.movie" {
+            let videoURL = info[UIImagePickerController.InfoKey.mediaURL] as! URL;
+            let cachePath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask);
+            let destUrl = URL(string: cachePath[0].absoluteString + videoURL.lastPathComponent);
+            do {
+                try FileManager.default.copyItem(at: videoURL, to: destUrl!);
+            } catch let error {
+                print("Error: \(error)");
+            }
+            self.completionHandler?([destUrl!])
         } else {
             let originalImage: UIImage = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
             var imageUrl: URL? = nil
@@ -168,13 +161,6 @@ public class WMFilePicker: NSObject,
     
     public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
       self.completionHandler?([URL]())
-    }
-    
-    
-    //MARK: AssetsPickerViewControllerDelegate
-    
-    public func assetsPicker(controller: AssetsPickerViewController, selected assets: [PHAsset]) {
-        getURLs(assets);
     }
     
     private func getURLs(_ assets: [PHAsset], i: Int = 0, urls: [URL] = []) {

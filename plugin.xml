@@ -52,17 +52,5 @@
         </config-file>
         <source-file src="src/ios/WMFileService.swift" />
         <source-file src="src/ios/WMFilePicker.swift" />
-        
-        <framework src="AssetsPickerViewController" type="podspec" spec="~> 2.0"/>
-        <!--
-        Phonegap build service is not supporting podspec yet.
-        <podspec>
-            <config>
-                <source url="https://github.com/CocoaPods/Specs.git"/>
-            </config>
-            <pods use-frameworks="true">
-                <pod name="AssetsPickerViewController" spec="~> 2.0" />
-            </pods>
-        </podspec>-->
     </platform>
 </plugin>
