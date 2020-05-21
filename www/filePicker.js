@@ -30,7 +30,7 @@ var exec = require('cordova/exec');
  * phone, etc.
  * @constructor
  */
-function FileService () {
+function FilePicker () {
 
 }
 
@@ -40,7 +40,7 @@ function FileService () {
  * @param {Function} successCallback The function to call when the heading data is available
  * @param {Function} errorCallback The function to call when there is an error getting the heading data. (OPTIONAL)
  */
-FileService.prototype.select = function (options, successCallback, errorCallback) {
+FilePicker.prototype.select = function (options, successCallback, errorCallback) {
     var DEFAULT_OPTIONS = {
         'multiple': false,
         "type": "FILE"
@@ -51,10 +51,10 @@ FileService.prototype.select = function (options, successCallback, errorCallback
             options[key] = DEFAULT_OPTIONS[key];
         }
     }
-    exec(successCallback, errorCallback, 'FileService', 'selectFiles', [options]);
+    exec(successCallback, errorCallback, 'FilePicker', 'selectFiles', [options]);
 };
 
-FileService.prototype.selectImage = function(multiple, successCallback, errorCallback) {
+FilePicker.prototype.selectImage = function(multiple, successCallback, errorCallback) {
     var options = {
         "multiple": multiple,
         "type": "IMAGE"
@@ -62,7 +62,7 @@ FileService.prototype.selectImage = function(multiple, successCallback, errorCal
     this.select(options, successCallback, errorCallback);
 };
 
-FileService.prototype.selectVideo = function(multiple, successCallback, errorCallback) {
+FilePicker.prototype.selectVideo = function(multiple, successCallback, errorCallback) {
     var options = {
         "multiple": multiple,
         "type": "VIDEO"
@@ -70,7 +70,7 @@ FileService.prototype.selectVideo = function(multiple, successCallback, errorCal
     this.select(options, successCallback, errorCallback);
 };
 
-FileService.prototype.selectAudio = function(multiple, successCallback, errorCallback) {
+FilePicker.prototype.selectAudio = function(multiple, successCallback, errorCallback) {
     var options = {
         "multiple": multiple,
         "type": "AUDIO"
@@ -78,7 +78,7 @@ FileService.prototype.selectAudio = function(multiple, successCallback, errorCal
     this.select(options, successCallback, errorCallback);
 };
 
-FileService.prototype.selectFiles = function(multiple, successCallback, errorCallback) {
+FilePicker.prototype.selectFiles = function(multiple, successCallback, errorCallback) {
     var options = {
         "multiple": multiple,
         "type": "FILE"
@@ -86,4 +86,4 @@ FileService.prototype.selectFiles = function(multiple, successCallback, errorCal
     this.select(options, successCallback, errorCallback);
 };
 
-module.exports = new FileService();
+module.exports = new FilePicker();

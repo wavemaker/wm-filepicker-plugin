@@ -1,17 +1,20 @@
 /*
- * Copyright (C) 2007-2008 OpenIntents.org
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package com.wavemaker.cordova.plugin;
@@ -21,64 +24,15 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-/**
- * @version 2009-07-03
- * @author Peli
- * @version 2013-12-11
- * @author paulburke (ipaulpro)
- */
-public class FileHelper {
-    private FileHelper() {} //private constructor to enforce Singleton pattern
+public class FileUtils {
 
     /** TAG for log messages. */
     static final String TAG = "FileUtils";
-
-    /**
-     * Gets the extension of a file name, like ".png" or ".jpg".
-     *
-     * @param uri
-     * @return Extension including the dot("."); "" if there is no extension;
-     *         null if uri was null.
-     */
-    public static String getExtension(String uri) {
-        if (uri == null) {
-            return null;
-        }
-
-        int dot = uri.lastIndexOf(".");
-        if (dot >= 0) {
-            return uri.substring(dot);
-        } else {
-            // No extension.
-            return "";
-        }
-    }
-    /**
-     * @return The MIME type for the given file.
-     */
-    public static String getMimeType(File file) {
-
-        String extension = getExtension(file.getName());
-
-        if (extension.length() > 0)
-            return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.substring(1));
-
-        return "application/octet-stream";
-    }
-
-    /**
-     * @return The MIME type for the give Uri.
-     */
-    public static String getMimeType(Context context, Uri uri) {
-        File file = new File(getPath(context, uri));
-        return getMimeType(file);
-    }
 
     /**
      * Get the value of the data column for this Uri. This is useful for
@@ -86,13 +40,10 @@ public class FileHelper {
      *
      * @param context The context.
      * @param uri The Uri to query.
-     * @param selection (Optional) Filter used in the query.
-     * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      * @author paulburke
      */
-    private static String getDataColumn(Context context, Uri uri, String selection,
-                                        String[] selectionArgs) {
+    private static String getDataColumn(Context context, Uri uri) {
 
         Cursor cursor = null;
         final String column = "_data";
@@ -101,7 +52,7 @@ public class FileHelper {
         };
 
         try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+            cursor = context.getContentResolver().query(uri, projection, null, null,
                     null);
             if (cursor != null && cursor.moveToFirst()) {
                 final int column_index = cursor.getColumnIndexOrThrow(column);
@@ -129,7 +80,7 @@ public class FileHelper {
     public static String getPath(final Context context, final Uri uri) {
         String path = null;
         if ("content".equalsIgnoreCase(uri.getScheme())) {
-            path = getDataColumn(context, uri, null, null);
+            path = getDataColumn(context, uri);
         }
         if (path == null && "file".equalsIgnoreCase(uri.getScheme())) {
             path = uri.getPath();

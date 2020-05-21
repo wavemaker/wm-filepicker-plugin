@@ -20,13 +20,20 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
     xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-wm-file" version="0.0.1">
-    <name>File</name>
-    <description>Wavemaker File Plugin</description>
+    <name>wm-filepicker-plugin</name>
+    <description>Cordova plugin that exposes API to select images, videos, audio and files.</description>
     <license>Apache 2.0</license>
     <keywords>cordova,wavemaker,file</keywords>
-    <js-module src="www/fileService.js" name="fileService">
-        <clobbers target="cordova.wavemaker.fileService" />
+    <js-module src="www/filePicker.js" name="filePicker">
+        <clobbers target="cordova.wavemaker.filePicker" />
     </js-module>
+
+    <engines>
+        <engine name="cordova" version=">=9.0.0" />
+        <engine name="cordova-android" version=">=8.0.0" />
+        <engine name="cordova-ios" version=">=5.0.0" />
+    </engines>
+
     <!-- android -->
     <platform name="android">
         <config-file target="AndroidManifest.xml" parent="/*">
@@ -34,23 +41,23 @@
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         </config-file>
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="FileService">
-                <param name="android-package" value="com.wavemaker.cordova.plugin.FileServicePlugin" />
+            <feature name="FilePicker">
+                <param name="android-package" value="com.wavemaker.cordova.plugin.FilePickerPlugin" />
             </feature>
         </config-file>
 
-        <source-file src="src/android/FileServicePlugin.java" target-dir="src/com/wavemaker/cordova/plugin" />
-        <source-file src="src/android/FileHelper.java" target-dir="src/com/wavemaker/cordova/plugin" />
+        <source-file src="src/android/FilePickerPlugin.java" target-dir="src/com/wavemaker/cordova/plugin" />
+        <source-file src="src/android/FileUtils.java" target-dir="src/com/wavemaker/cordova/plugin" />
     </platform>
 
     <!-- ios -->
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
-            <feature name="FileService">
-                <param name="ios-package" value="WMFileService"/>
+            <feature name="FilePicker">
+                <param name="ios-package" value="WMFilePicker"/>
             </feature>
         </config-file>
-        <source-file src="src/ios/WMFileService.swift" />
+        <source-file src="src/ios/WMFilePickerPlugin.swift" />
         <source-file src="src/ios/WMFilePicker.swift" />
     </platform>
 </plugin>

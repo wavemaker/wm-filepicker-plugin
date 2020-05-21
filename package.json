@@ -1,10 +1,10 @@
 {
-  "name": "wavemaker-plugin-file",
+  "name": "wm-filepicker-plugin",
   "version": "0.0.1",
-  "description": "Wavemaker File Plugin",
+  "description": "Cordova plugin that exposes API to select images, videos, audio and files.",
   "types": "",
   "cordova": {
-    "id": "cordova-plugin-wm-file",
+    "id": "wm-filepicker-plugin",
     "platforms": [
       "android",
       "ios"
@@ -21,12 +21,5 @@
   "scripts": {},
   "author": "Apache Software Foundation",
   "license": "Apache-2.0",
-  "engines": {
-    "cordovaDependencies": {
-      "3.0.0": {
-        "cordova": ">100"
-      }
-    }
-  },
   "devDependencies": {}
 }
