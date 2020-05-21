@@ -54,10 +54,9 @@
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="FilePicker">
-                <param name="ios-package" value="WMFilePicker"/>
+                <param name="ios-package" value="WMFilePickerPlugin"/>
             </feature>
         </config-file>
         <source-file src="src/ios/WMFilePickerPlugin.swift" />
-        <source-file src="src/ios/WMFilePicker.swift" />
     </platform>
 </plugin>
