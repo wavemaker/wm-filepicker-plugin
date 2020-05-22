@@ -21,6 +21,9 @@ import Foundation
 import Photos
 import UIKit
 import MobileCoreServices
+import MediaPlayer
+import AVFoundation
+
 
 private let IMAGE = "IMAGE";
 private let VIDEO = "VIDEO";
@@ -37,7 +40,8 @@ public class WMFilePickerConfig {
 public class WMFilePicker: NSObject,
     UINavigationControllerDelegate,
     UIImagePickerControllerDelegate,
-    UIDocumentPickerDelegate {
+    UIDocumentPickerDelegate,
+    MPMediaPickerControllerDelegate {
     
     public static let sharedInstance = WMFilePicker();
     
@@ -56,7 +60,12 @@ public class WMFilePicker: NSObject,
         self.completionHandler = onCompletion;
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet);
         var handler = {(a:UIAlertAction?) in };
-        if (type == IMAGE || type == VIDEO) {
+        if (type == AUDIO) {
+            handler = {(a) in
+                self.showMediaLibrary(vc: vc, multiple: multiple);
+            };
+            alert.addAction(UIAlertAction(title: "Pick From Library", style: .default, handler: handler));
+        } else if (type == IMAGE || type == VIDEO) {
             if (self.config.useCamera
                 && UIImagePickerController.isSourceTypeAvailable(.camera)) {
                 let title = type == IMAGE ? "Take Picture" : "Capture Video";
@@ -65,6 +74,7 @@ public class WMFilePicker: NSObject,
                 };
                 alert.addAction(UIAlertAction(title: title, style: .default, handler: handler));
             }
+            
             if (self.config.useLibrary) {
                 handler = {(a) in
                     self.showLibraryUI(view: vc, type: type, multiple: multiple);
@@ -100,6 +110,15 @@ public class WMFilePicker: NSObject,
         self.presentingViewController = cameraPicker;
     }
     
+    private func showMediaLibrary(vc: UIViewController, multiple: Bool) {
+        let mediaPicker = MPMediaPickerController(mediaTypes: .music);
+        mediaPicker.allowsPickingMultipleItems = multiple;
+        mediaPicker.delegate = self;
+        mediaPicker.showsCloudItems = false;
+        vc.present(mediaPicker, animated: true, completion: nil);
+        self.presentingViewController = mediaPicker;
+    }
+    
     private func showCloudUI(vc: UIViewController, type: String, multiple: Bool) {
         var types = [String(kUTTypeData)];
         if(type == IMAGE) {
@@ -115,6 +134,7 @@ public class WMFilePicker: NSObject,
         }
         picker.delegate = self;
         vc.present(picker, animated: true, completion: nil);
+        self.presentingViewController = picker;
     }
     
     private func showLibraryUI(view: UIViewController, type: String, multiple: Bool) {
@@ -130,6 +150,49 @@ public class WMFilePicker: NSObject,
         }
         view.present(picker, animated: true, completion: nil);
         self.presentingViewController = picker;
+    }
+    
+    //MARK: MPMediaPickerControllerDelegate
+    public func mediaPicker(_ mediaPicker: MPMediaPickerController, didPickMediaItems mediaItemCollection: MPMediaItemCollection) {
+        let noOfFilesSelected = mediaItemCollection.count;
+        var noOfFilesProcessed = 0;
+        var urls = [URL]();
+        mediaItemCollection.items.forEach({
+            mediaItem in
+            let audioURL = mediaItem.value(forKeyPath: MPMediaItemPropertyAssetURL) as! URL;
+            let exporter = AVAssetExportSession(asset: AVURLAsset(url: audioURL, options: nil), presetName: AVAssetExportPresetAppleM4A);
+            exporter?.outputFileType = .m4a;
+            let dFileManager = FileManager.default;
+            let filename = String.localizedStringWithFormat("%@.m4a", mediaItem.title ?? UUID().uuidString).removingPercentEncoding;
+            let cachePath = dFileManager.urls(for: .cachesDirectory, in: .userDomainMask);
+            let exportUrl = cachePath[0].appendingPathComponent(filename!);
+            if (dFileManager.fileExists(atPath: exportUrl.path)) {
+                do {
+                  try dFileManager.removeItem(atPath: exportUrl.path);
+                } catch let error {
+                    print("Error: \(error)");
+                }
+            }
+            exporter?.outputURL = exportUrl;
+            exporter?.exportAsynchronously(completionHandler: {
+                print("exporting status of \(filename!) is \(exporter!.status.rawValue)");
+                noOfFilesProcessed += 1;
+                if(exporter?.status == AVAssetExportSession.Status.completed) {
+                    urls.append(exportUrl);
+                } else if(exporter?.status == AVAssetExportSession.Status.failed) {
+                    print("\(exporter!.error.debugDescription)")
+                }
+                if(noOfFilesSelected == noOfFilesProcessed) {
+                    self.completionHandler?(urls);
+                }
+            });
+        });
+        self.presentingViewController?.dismiss(animated: true, completion: nil);
+    }
+    
+    
+    public func mediaPickerDidCancel(_ mediaPicker: MPMediaPickerController) {
+        self.presentingViewController?.dismiss(animated: true, completion: nil);
     }
     
     //MARK: UIImagePickerControllerDelegate
@@ -166,12 +229,14 @@ public class WMFilePicker: NSObject,
     
     // MARK: UIDocumentPickerDelegate
     
-    public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
-        self.completionHandler?([url]);
+    public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        self.completionHandler?(urls);
+        self.presentingViewController?.dismiss(animated: true, completion: nil);
     }
     
     public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-      self.completionHandler?([URL]())
+        self.completionHandler?([URL]());
+        self.presentingViewController?.dismiss(animated: true, completion: nil);
     }
     
     private func getURLs(_ assets: [PHAsset], i: Int = 0, urls: [URL] = []) {
