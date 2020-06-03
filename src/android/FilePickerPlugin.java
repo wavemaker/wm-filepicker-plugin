@@ -114,20 +114,20 @@ public class FilePickerPlugin extends CordovaPlugin {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         JSONArray files = new JSONArray();
-            if (requestCode == FILE_REQUEST_CODE) {
-                if (resultCode == Activity.RESULT_OK) {
-                    ClipData clipData = data.getClipData();
-                    if (clipData != null) {
-                        for (int i = 0; i < clipData.getItemCount(); i++) {
-                            files.put("" + FileUtils.getPath(this.cordova.getActivity(), clipData.getItemAt(i).getUri()));
-                        }
-                    } else if (data.getData() != null) {
-                        files.put("" + FileUtils.getPath(this.cordova.getActivity(), data.getData()));
+        if (requestCode == FILE_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                ClipData clipData = data.getClipData();
+                if (clipData != null) {
+                    for (int i = 0; i < clipData.getItemCount(); i++) {
+                        files.put("" + FileUtils.getPath(this.cordova.getActivity(), clipData.getItemAt(i).getUri()));
                     }
-                    this.mCallbackContext.success(files);
-                    this.mCallbackContext = null;
+                } else if (data.getData() != null) {
+                    files.put("" + FileUtils.getPath(this.cordova.getActivity(), data.getData()));
                 }
             }
+            this.mCallbackContext.success(files);
+            this.mCallbackContext = null;
+        }
     }
 
     @Override
