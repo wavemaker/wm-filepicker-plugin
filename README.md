@@ -4,16 +4,16 @@
 Cordova plugin that exposes API to select images, videos, audio and files. This plugin supports both Android and iOS. In iOS, this plugin doesn't support selecting multiple files.
 
 ## ANDROID
-![image selector preview](assets/android/image_sel_preview.png)
-![video selector preview](assets/android/video_sel_preview.png)
-![audio selector preview](assets/android/audio_sel_preview.png)
-![file selector preview](assets/android/file_sel_preview.png)
+![image selector preview](assets/android/image_sel_preview.png =200x)
+![video selector preview](assets/android/video_sel_preview.png =200x)
+![audio selector preview](assets/android/audio_sel_preview.png =200x)
+![file selector preview](assets/android/file_sel_preview.png =200x)
 
 ## IOS
-![image selector preview](assets/ios/image_sel_preview.png)
-![video selector preview](assets/ios/video_sel_preview.png)
-![audio selector preview](assets/ios/audio_sel_preview.png)
-![file selector preview](assets/ios/file_sel_preview.png)
+![image selector preview](assets/ios/image_sel_preview.jpg =200x)
+![video selector preview](assets/ios/video_sel_preview.jpg =200x)
+![audio selector preview](assets/ios/audio_sel_preview.jpg =200x)
+![file selector preview](assets/ios/file_sel_preview.jpg =200x)
 
 In config.xml, under ios platform add the swift version.
 ```
