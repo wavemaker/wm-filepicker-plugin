@@ -4,16 +4,14 @@
 Cordova plugin that exposes API to select images, videos, audio and files. This plugin supports both Android and iOS. In iOS, this plugin doesn't support selecting multiple files.
 
 ## ANDROID
-<img src="assets/android/image_sel_preview.png" width="200px">
-<img src="assets/android/video_sel_preview.png" width="200px">
-<img src="assets/android/audio_sel_preview.png" width="200px">
-<img src="assets/android/file_sel_preview.png" width="200px">
+IMAGE|VIDEO|AUDIO|FILE
+-----|-----|-----|----
+<img src="assets/android/image_sel_preview.png" width="200px">|<img src="assets/android/video_sel_preview.png" width="200px">|<img src="assets/android/audio_sel_preview.png" width="200px">|<img src="assets/android/file_sel_preview.png" width="200px">
 
 ## IOS
-<img src="assets/ios/image_sel_preview.jpg" width="200px">
-<img src="assets/ios/video_sel_preview.jpg" width="200px">
-<img src="assets/ios/audio_sel_preview.jpg" width="200px">
-<img src="assets/ios/file_sel_preview.jpg" width="200px">
+IMAGE|VIDEO|AUDIO|FILE
+-----|-----|-----|----
+<img src="assets/ios/image_sel_preview.jpg" width="200px">|<img src="assets/ios/video_sel_preview.jpg" width="200px">|<img src="assets/ios/audio_sel_preview.jpg" width="200px">|<img src="assets/ios/file_sel_preview.jpg" width="200px">
 
 In config.xml, under ios platform add the swift version.
 ```
