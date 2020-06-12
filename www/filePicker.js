@@ -58,7 +58,7 @@ FilePicker.prototype.selectImage = function(multiple, successCallback, errorCall
     var options = {
         "multiple": multiple,
         "type": "IMAGE",
-        "useCustomLibrary": true || !!onLibraryChoosen
+        "useCustomLibrary": !!onLibraryChoosen
     };
     this.select(options, function(paths) {
         if (paths.length > 0 && paths[0] === 'use-custom-library') {
@@ -73,7 +73,7 @@ FilePicker.prototype.selectVideo = function(multiple, successCallback, errorCall
     var options = {
         "multiple": multiple,
         "type": "VIDEO",
-        "useCustomLibrary": true || !!onLibraryChoosen
+        "useCustomLibrary": !!onLibraryChoosen
     };
     this.select(options, function(paths) {
         if (paths.length > 0 && paths[0] === 'use-custom-library') {
