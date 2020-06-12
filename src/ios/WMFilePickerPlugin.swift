@@ -91,8 +91,9 @@ public class WMFilePicker: NSObject,
         if (alert.actions.count == 1) {
             handler(nil);
         } else {
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
-                vc.present(alert, animated: true, completion: nil);
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (a) in self.completionHandler?([URL]());
+            }));
+            vc.present(alert, animated: true, completion: nil);
         }
     }
     
@@ -192,6 +193,7 @@ public class WMFilePicker: NSObject,
     
     
     public func mediaPickerDidCancel(_ mediaPicker: MPMediaPickerController) {
+        self.completionHandler?([URL]());
         self.presentingViewController?.dismiss(animated: true, completion: nil);
     }
     
