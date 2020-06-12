@@ -33,6 +33,7 @@ private let FILE = "FILE";
 public class WMFilePickerConfig {
     public var useCamera = false;
     public var useLibrary = true;
+    public var useCustomLibrary = false;
     public var useCloud = true;
 }
 
@@ -77,7 +78,12 @@ public class WMFilePicker: NSObject,
             
             if (self.config.useLibrary) {
                 handler = {(a) in
-                    self.showLibraryUI(view: vc, type: type, multiple: multiple);
+                    if (self.config.useCustomLibrary) {
+                        self.completionHandler?([URL(string: "use-custom-library")!]);
+                        self.presentingViewController?.dismiss(animated: true, completion: nil);
+                    } else {
+                        self.showLibraryUI(view: vc, type: type, multiple: multiple);
+                    }
                 };
                 alert.addAction(UIAlertAction(title: "Pick From Library", style: .default, handler: handler));
             }
@@ -298,6 +304,7 @@ public class WMFilePickerPlugin: CDVPlugin {
         let multiple = options["multiple"] as? Bool ?? false;
         WMFilePicker.sharedInstance.config.useCamera = options["useCamera"] as? Bool ?? false;
         WMFilePicker.sharedInstance.config.useLibrary = options["useLibrary"] as? Bool ?? true;
+        WMFilePicker.sharedInstance.config.useCustomLibrary = options["useCustomLibrary"] as? Bool ?? false;
         WMFilePicker.sharedInstance.config.useCloud = options["useICloud"] as? Bool ?? true;
         WMFilePicker.sharedInstance.present(vc: viewController, type: type, multiple: multiple, onCompletion:{ (urls: [URL]) in
             let paths = urls.map { url in url.absoluteString };

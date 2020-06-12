@@ -54,21 +54,36 @@ FilePicker.prototype.select = function (options, successCallback, errorCallback)
     exec(successCallback, errorCallback, 'FilePicker', 'selectFiles', [options]);
 };
 
-FilePicker.prototype.selectImage = function(multiple, successCallback, errorCallback) {
+FilePicker.prototype.selectImage = function(multiple, successCallback, errorCallback, onLibraryChoosen) {
     var options = {
         "multiple": multiple,
-        "type": "IMAGE"
+        "type": "IMAGE",
+        "useCustomLibrary": true || !!onLibraryChoosen
     };
-    this.select(options, successCallback, errorCallback);
+    this.select(options, function(paths) {
+        if (paths.length > 0 && paths[0] === 'use-custom-library') {
+            onLibraryChoosen();
+        } else {
+            successCallback(paths);
+        }
+    }, errorCallback);
 };
 
-FilePicker.prototype.selectVideo = function(multiple, successCallback, errorCallback) {
+FilePicker.prototype.selectVideo = function(multiple, successCallback, errorCallback, onLibraryChoosen) {
     var options = {
         "multiple": multiple,
-        "type": "VIDEO"
+        "type": "VIDEO",
+        "useCustomLibrary": true || !!onLibraryChoosen
     };
-    this.select(options, successCallback, errorCallback);
+    this.select(options, function(paths) {
+        if (paths.length > 0 && paths[0] === 'use-custom-library') {
+            onLibraryChoosen();
+        } else {
+            successCallback(paths);
+        }
+    }, errorCallback);
 };
+
 
 FilePicker.prototype.selectAudio = function(multiple, successCallback, errorCallback) {
     var options = {
