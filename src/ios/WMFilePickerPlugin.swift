@@ -23,6 +23,7 @@ import UIKit
 import MobileCoreServices
 import MediaPlayer
 import AVFoundation
+import AssetsPickerViewController
 
 
 private let IMAGE = "IMAGE";
@@ -42,7 +43,8 @@ public class WMFilePicker: NSObject,
     UINavigationControllerDelegate,
     UIImagePickerControllerDelegate,
     UIDocumentPickerDelegate,
-    MPMediaPickerControllerDelegate {
+    MPMediaPickerControllerDelegate,
+    AssetsPickerViewControllerDelegate {
     
     public static let sharedInstance = WMFilePicker();
     
@@ -145,18 +147,44 @@ public class WMFilePicker: NSObject,
     }
     
     private func showLibraryUI(view: UIViewController, type: String, multiple: Bool) {
-        let picker = UIImagePickerController();
-        picker.delegate = self;
-        picker.sourceType = .photoLibrary;
+        let picker = AssetsPickerViewController();
+        picker.pickerDelegate = self;
+        let options = PHFetchOptions();
+        options.includeHiddenAssets = false;
+        options.includeAllBurstAssets = false;
+        options.sortDescriptors = [
+            NSSortDescriptor(key: "creationDate", ascending: true),
+            NSSortDescriptor(key: "modificationDate", ascending: true)
+        ];
         if (type == IMAGE) {
-            picker.mediaTypes = ["public.image"];
+            options.predicate = NSPredicate(format: "mediaType = %d and (mediaSubtypes & %d = 0)", PHAssetMediaType.image.rawValue, PHAssetMediaSubtype.photoLive.rawValue);
         } else if (type == VIDEO) {
-            picker.mediaTypes = ["public.movie"];
+            options.predicate = NSPredicate(format: "mediaType = %d and (mediaSubtypes & %d = 0)", PHAssetMediaType.video.rawValue, PHAssetMediaSubtype.videoTimelapse.rawValue);
         } else if (type == AUDIO) {
-            picker.mediaTypes = ["public.audio"];
+            options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.audio.rawValue);
+        } else {
+            options.predicate = NSPredicate(format: "1 == 1", true);
         }
+        picker.pickerConfig.assetFetchOptions = [
+            .smartAlbum: options,
+            .album: options
+        ];
+        picker.pickerConfig.albumIsShowMomentAlbums = false;
+        picker.pickerConfig.albumIsShowHiddenAlbum = false;
+        picker.pickerConfig.albumIsShowEmptyAlbum = false;
+        picker.pickerConfig.assetsMaximumSelectionCount = multiple ? Int.max : 1;
         view.present(picker, animated: true, completion: nil);
         self.presentingViewController = picker;
+    }
+    
+    //MARK: AssetsPickerViewControllerDelegate
+    public func assetsPicker(controller: AssetsPickerViewController, selected assets: [PHAsset]) {
+        getURLs(assets);
+    }
+    
+    public func assetsPickerDidCancel(controller: AssetsPickerViewController) {
+        self.completionHandler?([URL]());
+        self.presentingViewController?.dismiss(animated: true, completion: nil);
     }
     
     //MARK: MPMediaPickerControllerDelegate
