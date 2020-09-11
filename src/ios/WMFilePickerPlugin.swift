@@ -177,7 +177,7 @@ public class WMFilePicker: NSObject,
         self.presentingViewController = picker;
     }
     
-    //MARK: AssetsPickerViewControllerDelegate
+    //MARK: AssetsPickerViewControllerDelegate      
     public func assetsPicker(controller: AssetsPickerViewController, selected assets: [PHAsset]) {
         getURLs(assets);
     }
@@ -282,7 +282,9 @@ public class WMFilePicker: NSObject,
             return;
         }
         self.getURL(asset: assets[i], completionHandler: { (url: URL?) in
-            _urls.append(url!);
+            if (url != nil) {
+                _urls.append(url!);
+            }
             self.getURLs(assets, i: i + 1, urls: _urls);
         });
     }
@@ -294,7 +296,11 @@ public class WMFilePicker: NSObject,
                 return true
             }
             asset.requestContentEditingInput(with: options, completionHandler: {(contentEditingInput: PHContentEditingInput?, info: [AnyHashable : Any]) -> Void in
-                completionHandler(contentEditingInput!.fullSizeImageURL as URL?)
+                if (contentEditingInput != nil) {
+                    completionHandler(contentEditingInput!.fullSizeImageURL as URL?);
+                } else {
+                    completionHandler(nil);
+                }
             })
         } else if asset.mediaType == .video {
             let options: PHVideoRequestOptions = PHVideoRequestOptions()
