@@ -13,9 +13,24 @@ IMAGE|VIDEO|AUDIO|FILE
 -----|-----|-----|----
 <img src="assets/ios/image_sel_preview.jpg" width="200px">|<img src="assets/ios/video_sel_preview.jpg" width="200px">|<img src="assets/ios/audio_sel_preview.jpg" width="200px">|<img src="assets/ios/file_sel_preview.jpg" width="200px">
 
-In config.xml, under ios platform add the swift version.
+In config.xml, under ios platform add the following. Descriptions can be altered.
 ```
 <preference name="SwiftVersion" value="4.2"/>
+```
+```
+<edit-config target="NSAppleMusicUsageDescription" mode="merge" file="*-Info.plist">
+	<string>need music library access to upload audio files</string>
+</edit-config>
+```
+```
+<edit-config target="NSPhotoLibraryAddUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need photo library access to save pictures there</string>
+</edit-config>
+```
+```
+<edit-config target="NSPhotoLibraryUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need photo library access to get pictures from there</string>
+</edit-config>
 ```
 
 ## API
