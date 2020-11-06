@@ -157,9 +157,9 @@ public class WMFilePicker: NSObject,
             NSSortDescriptor(key: "modificationDate", ascending: true)
         ];
         if (type == IMAGE) {
-            options.predicate = NSPredicate(format: "mediaType = %d and (mediaSubtypes & %d = 0)", PHAssetMediaType.image.rawValue, PHAssetMediaSubtype.photoLive.rawValue);
+            options.predicate = NSPredicate(format: "mediaType = %d and (mediaSubtype & %d = 0)", PHAssetMediaType.image.rawValue, PHAssetMediaSubtype.photoLive.rawValue);
         } else if (type == VIDEO) {
-            options.predicate = NSPredicate(format: "mediaType = %d and (mediaSubtypes & %d = 0)", PHAssetMediaType.video.rawValue, PHAssetMediaSubtype.videoTimelapse.rawValue);
+            options.predicate = NSPredicate(format: "mediaType = %d and (mediaSubtype & %d = 0)", PHAssetMediaType.video.rawValue, PHAssetMediaSubtype.videoTimelapse.rawValue);
         } else if (type == AUDIO) {
             options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.audio.rawValue);
         } else {
