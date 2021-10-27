@@ -20,6 +20,7 @@ package com.wavemaker.cordova.plugin;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaPluginPathHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,6 +53,7 @@ public class FilePickerPlugin extends CordovaPlugin {
     private String mimeType;
     private boolean multiple;
     private CallbackContext mCallbackContext;
+    private CordovaPluginPathHandler pathHandler;
 
     /**
      * Constructor.
@@ -152,6 +154,14 @@ public class FilePickerPlugin extends CordovaPlugin {
         showBrowser.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, multiple);
         showBrowser.setType(mimeType);
         this.cordova.startActivityForResult(this, showBrowser, FILE_REQUEST_CODE);
+    }
+
+    @Override
+    public CordovaPluginPathHandler getPathHandler() {
+        if (this.pathHandler == null) {
+            this.pathHandler = new CordovaPluginPathHandler(new FilePathHandler(this.cordova.getContext()));
+        }
+        return this.pathHandler;
     }
 }
 

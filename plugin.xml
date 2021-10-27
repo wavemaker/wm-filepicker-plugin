@@ -37,11 +37,13 @@
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="FilePicker">
                 <param name="android-package" value="com.wavemaker.cordova.plugin.FilePickerPlugin" />
+                <param name="onload" value="true" />
             </feature>
         </config-file>
 
         <source-file src="src/android/FilePickerPlugin.java" target-dir="src/com/wavemaker/cordova/plugin" />
         <source-file src="src/android/FileUtils.java" target-dir="src/com/wavemaker/cordova/plugin" />
+        <source-file src="src/android/FilePathHandler.java" target-dir="src/com/wavemaker/cordova/plugin" />
     </platform>
 
     <!-- ios -->
