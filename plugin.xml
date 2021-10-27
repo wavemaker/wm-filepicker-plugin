@@ -44,6 +44,8 @@
         <source-file src="src/android/FilePickerPlugin.java" target-dir="src/com/wavemaker/cordova/plugin" />
         <source-file src="src/android/FileUtils.java" target-dir="src/com/wavemaker/cordova/plugin" />
         <source-file src="src/android/FilePathHandler.java" target-dir="src/com/wavemaker/cordova/plugin" />
+
+        <framework src="androidx.webkit:webkit:${cordovaConfig.ANDROIDX_WEBKIT_VERSION}" />
     </platform>
 
     <!-- ios -->
