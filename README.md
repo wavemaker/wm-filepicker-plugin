@@ -1,5 +1,5 @@
 
-# wm-filepicker-plugin
+# wm-cordova-plugin-filepicker
 
 Cordova plugin that exposes API to select images, videos, audio and files. This plugin supports both Android and iOS. In iOS, this plugin doesn't support selecting multiple files.
 

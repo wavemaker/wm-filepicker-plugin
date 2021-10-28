@@ -19,8 +19,8 @@
 -->
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
-    xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-wm-file" version="0.0.1">
-    <name>wm-filepicker-plugin</name>
+    xmlns:android="http://schemas.android.com/apk/res/android" id="wm-cordova-plugin-filepicker" version="1.0.1">
+    <name>wm-cordova-plugin-filepicker</name>
     <description>Cordova plugin that exposes API to select images, videos, audio and files.</description>
     <license>Apache 2.0</license>
     <keywords>cordova,wavemaker,file</keywords>

@@ -1,10 +1,10 @@
 {
-  "name": "wm-filepicker-plugin",
-  "version": "0.0.1",
+  "name": "wm-cordova-plugin-filepicker",
+  "version": "1.0.1",
   "description": "Cordova plugin that exposes API to select images, videos, audio and files.",
   "types": "",
   "cordova": {
-    "id": "wm-filepicker-plugin",
+    "id": "wm-cordova-plugin-filepicker",
     "platforms": [
       "android",
       "ios"
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/wavemaker/wm-filepicker-plugin"
   },
   "bugs": {
     "url": ""
