@@ -1,6 +1,6 @@
 {
   "name": "wm-cordova-plugin-filepicker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Cordova plugin that exposes API to select images, videos, audio and files.",
   "types": "",
   "cordova": {
