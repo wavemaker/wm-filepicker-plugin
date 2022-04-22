@@ -22,10 +22,7 @@ function disableBitcode(pbxPath) {
 }
 
 function doHandle(context) {
-    const ConfigParser = context.requireCordovaModule('cordova-common/src/ConfigParser/ConfigParser');
     const projectRoot = context.opts.projectRoot;
-    const projectName = new ConfigParser(context, path.join(projectRoot, 'config.xml')).name();
-    disableBitcode(path.join(projectRoot, 'platforms', 'ios', projectName + '.xcodeproj/project.pbxproj'));
     disableBitcode(path.join(projectRoot, 'platforms', 'ios', 'Pods/Pods.xcodeproj/project.pbxproj'));
 };
 
