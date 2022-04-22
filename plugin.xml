@@ -46,6 +46,8 @@
 
     <!-- ios -->
     <platform name="ios">
+        <hook type="after_plugin_add" src="hooks/disable-bitcode.js" />
+        <hook type="after_platform_add" src="hooks/disable-bitcode.js" />
         <config-file target="config.xml" parent="/*">
             <feature name="FilePicker">
                 <param name="ios-package" value="WMFilePickerPlugin"/>
