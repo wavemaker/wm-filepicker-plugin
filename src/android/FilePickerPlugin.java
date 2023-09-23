@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -36,7 +37,8 @@ public class FilePickerPlugin extends CordovaPlugin {
     private static final String TAG = "FILE";
 
     //PERMISSION REQUEST CODE
-    private static final int WRITE_PERMISSION_REQUEST_CODE = 1000;
+    private static final int REQUEST_CODE_READ_MEDIA = 1001;
+    private static final int REQUEST_CODE_READ_EXTERNAL_STORAGE = 1002;
 
     //ACTIVITY REQUEST CODE
     private static final int FILE_REQUEST_CODE = 1000;
@@ -88,6 +90,7 @@ public class FilePickerPlugin extends CordovaPlugin {
         if ("selectFiles".equals(action)) {
             JSONObject options = args.getJSONObject(0);
             String type = options.getString("type");
+            
             if ("IMAGE".equals(type)) {
                 this.mimeType = "image/*";
             } else if ("VIDEO".equals(type)) {
@@ -97,12 +100,26 @@ public class FilePickerPlugin extends CordovaPlugin {
             } else {
                 this.mimeType = "*/*";
             }
+            
             this.multiple = options.getBoolean("multiple");
             this.mCallbackContext = callbackContext;
-            if (!this.cordova.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                this.cordova.requestPermission(this, 0, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            } else {
-                this.selectFiles();
+
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // Android API 33 and higher
+                if (!this.cordova.hasPermission(Manifest.permission.READ_MEDIA_IMAGES) && !this.cordova.hasPermission(Manifest.permission.READ_MEDIA_VIDEO)) {
+                    String[] permissions = {Manifest.permission.READ_MEDIA_IMAGES, Manifest.permission.READ_MEDIA_VIDEO};
+                    this.cordova.requestPermissions(this, REQUEST_CODE_READ_MEDIA, permissions);
+                } else {
+                    this.selectFiles();
+                }
+            }
+            else {
+                // Android API 32 or lower
+                if (!this.cordova.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    this.cordova.requestPermission(this, REQUEST_CODE_READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                } else {
+                    this.selectFiles();
+                }
             }
         } else {
             return false;
@@ -140,7 +157,8 @@ public class FilePickerPlugin extends CordovaPlugin {
                 return;
             }
         }
-        if (requestCode == WRITE_PERMISSION_REQUEST_CODE) {
+
+        if (requestCode == REQUEST_CODE_READ_MEDIA || requestCode == REQUEST_CODE_READ_EXTERNAL_STORAGE) {
             selectFiles();
         }
     }

@@ -30,10 +30,15 @@
 
     <!-- android -->
     <platform name="android">
-        <config-file target="AndroidManifest.xml" parent="/*">
-            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        <config-file target="AndroidManifest.xml" parent="/*" mode="merge">
+            <uses-permission android:maxSdkVersion="32" android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:maxSdkVersion="32" android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+          
+            <uses-permission android:minSdkVersion="33" android:name="android.permission.READ_MEDIA_AUDIO" />
+            <uses-permission android:minSdkVersion="33" android:name="android.permission.READ_MEDIA_IMAGES" />
+            <uses-permission android:minSdkVersion="33" android:name="android.permission.READ_MEDIA_VIDEO" />
         </config-file>
+      
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="FilePicker">
                 <param name="android-package" value="com.wavemaker.cordova.plugin.FilePickerPlugin" />
