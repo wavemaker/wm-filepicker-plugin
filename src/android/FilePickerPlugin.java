@@ -99,11 +99,7 @@ public class FilePickerPlugin extends CordovaPlugin {
             }
             this.multiple = options.getBoolean("multiple");
             this.mCallbackContext = callbackContext;
-            if (!this.cordova.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                this.cordova.requestPermission(this, 0, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            } else {
-                this.selectFiles();
-            }
+            this.selectFiles();
         } else {
             return false;
         }
