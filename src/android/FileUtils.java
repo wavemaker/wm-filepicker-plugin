@@ -22,6 +22,8 @@ package com.wavemaker.cordova.plugin;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
 
@@ -129,10 +131,32 @@ public class FileUtils {
                 }
                 outputStream.flush();
             }
+
+            long originalDate = getFileModifiedDate(context, uri);
+            file.setLastModified(originalDate);
+
             return file;
         } catch (Exception e) {
             Log.e(TAG, "Exception occured", e);
         }
         return  null;
     }
+
+	private static Long getFileModifiedDate(Context context, Uri uri) {
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
+            if (columnIndex == -1) {
+                columnIndex = cursor.getColumnIndex(DocumentsContract.Document.COLUMN_LAST_MODIFIED);
+            }
+            if (columnIndex != -1) {
+                String dateStr = cursor.getString(columnIndex);
+                if (dateStr != null) {
+                    return Long.parseLong(dateStr);
+                }
+            }
+        }
+
+        return null;
+	}
 }
