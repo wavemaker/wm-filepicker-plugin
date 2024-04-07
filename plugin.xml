@@ -19,7 +19,7 @@
 -->
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
-    xmlns:android="http://schemas.android.com/apk/res/android" id="wm-cordova-plugin-filepicker" version="1.0.3">
+    xmlns:android="http://schemas.android.com/apk/res/android" id="wm-cordova-plugin-filepicker" version="1.0.7">
     <name>wm-cordova-plugin-filepicker</name>
     <description>Cordova plugin that exposes API to select images, videos, audio and files.</description>
     <license>Apache 2.0</license>
@@ -54,13 +54,5 @@
             </feature>
         </config-file>
         <source-file src="src/ios/WMFilePickerPlugin.swift" />
-        <podspec>		
-             <config>		
-                 <source url="https://github.com/CocoaPods/Specs.git"/>		
-             </config>		
-             <pods use-frameworks="true">		
-                 <pod name="AssetsPickerViewController" spec="~> 2.0" />		
-             </pods>		
-         </podspec>
     </platform>
 </plugin>

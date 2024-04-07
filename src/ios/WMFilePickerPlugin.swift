@@ -23,7 +23,7 @@ import UIKit
 import MobileCoreServices
 import MediaPlayer
 import AVFoundation
-import AssetsPickerViewController
+import PhotosUI
 
 
 private let IMAGE = "IMAGE";
@@ -44,7 +44,7 @@ public class WMFilePicker: NSObject,
     UIImagePickerControllerDelegate,
     UIDocumentPickerDelegate,
     MPMediaPickerControllerDelegate,
-    AssetsPickerViewControllerDelegate {
+    PHPickerViewControllerDelegate {
     
     public static let sharedInstance = WMFilePicker();
     
@@ -83,8 +83,15 @@ public class WMFilePicker: NSObject,
                     if (self.config.useCustomLibrary) {
                         self.completionHandler?([URL(string: "use-custom-library")!]);
                         self.presentingViewController?.dismiss(animated: true, completion: nil);
-                    } else {
+                    } else if (type == IMAGE) {
                         self.showLibraryUI(view: vc, type: type, multiple: multiple);
+                    } else {
+                        let picker = UIImagePickerController()
+                        picker.sourceType = .photoLibrary
+                        picker.mediaTypes = [kUTTypeMovie as String]
+                        picker.delegate = self
+                        vc.present(picker, animated: true, completion: nil);
+                        self.presentingViewController = picker;
                     }
                 };
                 alert.addAction(UIAlertAction(title: "Pick From Library", style: .default, handler: handler));
@@ -147,45 +154,28 @@ public class WMFilePicker: NSObject,
     }
     
     private func showLibraryUI(view: UIViewController, type: String, multiple: Bool) {
-        let picker = AssetsPickerViewController();
-        picker.pickerDelegate = self;
-        let options = PHFetchOptions();
-        options.includeHiddenAssets = false;
-        options.includeAllBurstAssets = false;
-        options.sortDescriptors = [
-            NSSortDescriptor(key: "creationDate", ascending: true),
-            NSSortDescriptor(key: "modificationDate", ascending: true)
-        ];
-        if (type == IMAGE) {
-            options.predicate = NSPredicate(format: "mediaType = %d and (mediaSubtype & %d = 0)", PHAssetMediaType.image.rawValue, PHAssetMediaSubtype.photoLive.rawValue);
-        } else if (type == VIDEO) {
-            options.predicate = NSPredicate(format: "mediaType = %d and (mediaSubtype & %d = 0)", PHAssetMediaType.video.rawValue, PHAssetMediaSubtype.videoTimelapse.rawValue);
-        } else if (type == AUDIO) {
-            options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.audio.rawValue);
-        } else {
-            options.predicate = NSPredicate(format: "1 == 1", true);
+        var config = PHPickerConfiguration();
+        if #available(iOS 14.0, *) {
+            config.selectionLimit = multiple ? Int.max : 1;
         }
-        picker.pickerConfig.assetFetchOptions = [
-            .smartAlbum: options,
-            .album: options
-        ];
-        picker.pickerConfig.albumIsShowMomentAlbums = false;
-        picker.pickerConfig.albumIsShowHiddenAlbum = false;
-        picker.pickerConfig.albumIsShowEmptyAlbum = false;
-        picker.pickerConfig.assetsMaximumSelectionCount = multiple ? Int.max : 1;
+        if (type == IMAGE) {
+            config.filter = .any(of: [.livePhotos, .images]);
+        } else if (type == VIDEO) {
+            config.filter = .videos
+        } else {
+            config.filter = .any(of: [.livePhotos, .videos, .images])
+        }
+        let picker = PHPickerViewController(configuration: config);
+        picker.delegate = self;
         view.present(picker, animated: true, completion: nil);
         self.presentingViewController = picker;
     }
     
-    //MARK: AssetsPickerViewControllerDelegate      
-    public func assetsPicker(controller: AssetsPickerViewController, selected assets: [PHAsset]) {
-        getURLs(assets);
-    }
-    
-    public func assetsPickerDidCancel(controller: AssetsPickerViewController) {
-        self.completionHandler?([URL]());
-        self.presentingViewController?.dismiss(animated: true, completion: nil);
-    }
+    //MARK: PHPickerViewControllerDelegate
+     public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+         getURLs(results.map(\.itemProvider));
+         self.presentingViewController?.dismiss(animated: true, completion: nil);
+     }
     
     //MARK: MPMediaPickerControllerDelegate
     public func mediaPicker(_ mediaPicker: MPMediaPickerController, didPickMediaItems mediaItemCollection: MPMediaItemCollection) {
@@ -275,56 +265,44 @@ public class WMFilePicker: NSObject,
         self.presentingViewController?.dismiss(animated: true, completion: nil);
     }
     
-    private func getURLs(_ assets: [PHAsset], i: Int = 0, urls: [URL] = []) {
+    // MARK: Helper functions
+                                     
+    public func getImageUrl(image: UIImage) -> URL? {
+        var imageUrl: URL? = nil
+        if let data = image.pngData() {
+            let paths = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask);
+            imageUrl = URL(string: paths[0].absoluteString + UUID.init().uuidString + ".png")
+            try? data.write(to: imageUrl!)
+        }
+        return imageUrl;
+    }
+
+    private func getURLs(_ items: [NSItemProvider], i: Int = 0, urls: [URL] = []) {
         var _urls = [URL](urls);
-        if( i >= assets.count) {
+        if( i >= items.count) {
             self.completionHandler?(urls);
             return;
         }
-        self.getURL(asset: assets[i], completionHandler: { (url: URL?) in
+        self.getURL(item: items[i], completionHandler: { (url: URL?) in
             if (url != nil) {
                 _urls.append(url!);
             }
-            self.getURLs(assets, i: i + 1, urls: _urls);
+            self.getURLs(items, i: i + 1, urls: _urls);
         });
     }
     
-    private func getURL(asset: PHAsset, completionHandler : @escaping ((_ responseURL : URL?) -> Void)){
-        if asset.mediaType == .image {
-            let options: PHContentEditingInputRequestOptions = PHContentEditingInputRequestOptions()
-            options.canHandleAdjustmentData = {(adjustmeta: PHAdjustmentData) -> Bool in
-                return true
-            }
-            asset.requestContentEditingInput(with: options, completionHandler: {(contentEditingInput: PHContentEditingInput?, info: [AnyHashable : Any]) -> Void in
-                if (contentEditingInput != nil) {
-                    completionHandler(contentEditingInput!.fullSizeImageURL as URL?);
-                } else {
-                    completionHandler(nil);
-                }
-            })
-        } else if asset.mediaType == .video {
-            let options: PHVideoRequestOptions = PHVideoRequestOptions()
-            options.version = .original
-            PHImageManager.default().requestAVAsset(forVideo: asset, options: options, resultHandler: {(asset: AVAsset?, audioMix: AVAudioMix?, info: [AnyHashable : Any]?) -> Void in
-                if let urlAsset = asset as? AVURLAsset {
-                    let localVideoUrl: URL = urlAsset.url as URL
-                    completionHandler(localVideoUrl)
-                } else {
-                    completionHandler(nil)
-                }
-            })
-        } else if asset.mediaType == .audio {
-            let options: PHVideoRequestOptions = PHVideoRequestOptions();
-            options.version = .original;
-            PHImageManager.default().requestAVAsset(forVideo: asset, options: options, resultHandler: {(asset: AVAsset?, audioMix: AVAudioMix?, info: [AnyHashable : Any]?) -> Void in
-                if let urlAsset = asset as? AVURLAsset {
-                    let localVideoUrl: URL = urlAsset.url as URL
-                    completionHandler(localVideoUrl)
-                } else {
-                    completionHandler(nil)
-                }
-            })
-        }
+    private func getURL(item: NSItemProvider, completionHandler : @escaping ((_ responseURL : URL?) -> Void)){
+         if item.canLoadObject(ofClass: UIImage.self) {
+             item.loadObject(ofClass: UIImage.self) { (image, error) in
+                 DispatchQueue.main.async {
+                     let url = (self.getImageUrl(image: image as! UIImage ))!;
+                     completionHandler(url);
+                 }
+             }
+         } else {
+             print("No appropriate representation found for type \(item.registeredTypeIdentifiers)")
+             completionHandler(nil);
+         }
     }
 }
 
